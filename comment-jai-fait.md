@@ -31,23 +31,27 @@ J'ai prévu des effets à la con pour mon site, donc ça va barder.
 
 ```less
 	@brand-primary:         #ffa500; // orange !
-	@body-bg:               #428bca; // bleu
-	@text-color:            @gray-lighter;
+	@page-header-bg:        #428bca; // nouvelle variable pour la bannière et l'accueil - bleu
+	@body-bg:               lighten(@header-bg); // bleu
+	@page-header-text-color:	@gray-lighter; //nouvelle variable pour le texte de la bannière
+	@text-color:            @gray-darker;
 	@headings-color:        #fff;
+	
+	@border-radius-extreme:     35px; // pour les vignettes d'article
 ```
 
 ### Polices
 
-J'ai modifié *app.less* en rajoutant des @import pour chaque police Google que j'utlise (à savoir Roboto, Archivo Black et Chivo). Ça me permet ensuite de mettre ces polices dans *variables.less* :
+J'ai modifié `app.less` en rajoutant des `@import` pour chaque police Google que j'utlise (à savoir Roboto, Archivo Black et Chivo). Ça me permet ensuite de mettre ces polices dans `variables.less` :
 
 ```less
 	@font-family-sans-serif:  "Chivo", sans-serif;
 	@headings-font-family:    "Archivo Black", sans-serif;
 ```
 
-Pour le logo, j'ai dû changer les couleurs dans *variables.less*
+Pour le logo, j'ai dû changer la typo dans `navbar.less` et les couleurs dans `variables.less` ("*navbar brand label*").
 
-À présent je vais dans *type.less* et là on devrait commencer à rigoler :
+À présent je vais dans `type.less` et là on devrait commencer à rigoler :
 
 ```less
 	h1, .h1,
@@ -59,9 +63,21 @@ J'ajoute les bordules bien dégueu
 
 ### Virer le superflu
 
-J'ai commenté des trucs dans *bootstrap.less*. Reste à savoir qu'est-ce qui est inutile et qu'est-ce qui ne l'est pas.
+J'ai commenté des trucs dans `bootstrap.less`. Reste à savoir qu'est-ce qui est inutile et qu'est-ce qui ne l'est pas.
 
-### MISC
+##La Hiérarchie
+
+Si j'ai bien compris c'est :
+- `home.php` pour la page d'accueil (liste des articles les plus récents)
+- `single-critique` pour les critiques (il va falloir créer un "custom post type")
+- `single.php` pour les articles (càd tout le reste)
+- `category-critique.php` ça peut servir ça
+- `category.php`
+- `search.php` pour les recherches (bof)
+- `author.php` pour les auteurs (on peut distinguer par auteur mais osef)
+- `404.php` faudra bien y songer
+
+## MISC
 
 - je crois que je vais devoir virer le h1 comme sur Large Prime Numbers
 
