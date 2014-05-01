@@ -19,7 +19,7 @@ C'est là qu'il faut pas se faire niquer : ne _pas_ copier le dossier `/node_mod
 
 ##Taper dans les CSS !
 
-Ou plutôt "taper dans les Less", puisqu'ici on travaille avec des fichiers less de Bootstrap (tout est dans `/assets/less`) qu'on transforme ensuite en CSS avec Grunt. Faut que je consulte [la doc de Bootstrap](http://roots.io/modifying-bootstrap-in-roots/) (à ce stade, j'imagine que la doc de Boilerplate sera plutôt à étudier au moment de changer le code HTML).
+Ou plutôt "taper dans les Less", puisqu'ici on travaille avec des fichiers *.less de Bootstrap (tout est dans `/assets/less`) qu'on transforme ensuite en CSS avec Grunt. Faut que je consulte [la doc de Bootstrap](http://roots.io/modifying-bootstrap-in-roots/) (à ce stade, j'imagine que la doc de Boilerplate sera plutôt à étudier au moment de changer le code HTML).
 
 ### variables.less
 
@@ -59,7 +59,7 @@ Pour le logo, j'ai dû changer la typo dans `navbar.less` et les couleurs dans `
 	h3, .h3 { text-transform: uppercase; } // j'imagine que c'est bien pour les intertitres aussi
 ```
 
-J'ajoute les bordules bien dégueu
+J'ajoute les bordures bien dégueu
 
 ### Virer le superflu
 
@@ -75,9 +75,52 @@ Si j'ai bien compris c'est :
 - `category.php`
 - `search.php` pour les recherches (bof)
 - `author.php` pour les auteurs (on peut distinguer par auteur mais osef)
+- `page-about.php` mais `page.php` peut suffire
 - `404.php` faudra bien y songer
+
+### Home
+
+> Copy `index.php` to `home.php` for customizing the Home page if you’re showing the latest posts (under Reading Settings) instead of a static front page
+
+Ça tombe bien c'est exactement ce qu'il me faut.
+Par contre à mon avis, il ne faut pas faire ce qui suit : copier `templates/content.php` vers `content-home.php`
+J'ai ensuite fusionné `home.php` avec [ça](http://getbootstrap.com/components/#thumbnails), et pour aller à la ligne j'utilise [ce code](http://wordpress.org/support/topic/adding-a-clearing-div-to-every-third-post-in-the-loop) trouvé au pif sur Google, mais en virant la première ligne (càd en préservant la syntaxte normale de WP)
+> (à voir également : http://www.wpbeginner.com/wp-themes/how-to-create-a-grid-display-of-post-thumbnails-in-wordpress-themes/)
+
+#### Vignettes
+
+Pour l'effet d'*ombre* sur les vignettes, j'ai mis au point 2 méthodes :
+
+1. avec deux `<div>`, un gros (l'ombre) et un petit (l'image), ce qui me permet du texte qui déborde pas hors de l'ombre (marquee U-LÀLÀ)
+2. avec `box-shadow`, ce qui m'oblige à utiliser `position: relative` (y'a ptet une méthode plus élégante) pour pouvoir mettre du texte sur l'ombre
+
+Il me fallait le petit effet sur les vignettes, je les ai donc foutues dans un `<div class="parallelogramme">`, et le CSS correspondant dans `thumbnails.less` (en utilisant la méthode n°2 : celle à base de `box-shadow`) :
+
+```css
+.parallelogramme {
+  width:200px; 
+  height:200px; 
+  border-radius: 35px;
+  overflow: hidden;
+  transform: skew(-11deg); 
+    -webkit-transform: skew(-11deg);
+  border-radius: 35px;
+  box-shadow: 0 -30px 0 @brand-primary;
+}
+
+.parallelogramme img{
+  position: relative;
+  left: -20px;
+  top: -60px;
+  transform: skew(11deg); 
+    -webkit-transform: skew(11deg);
+}
+```
+
+
 
 ## MISC
 
 - je crois que je vais devoir virer le h1 comme sur Large Prime Numbers
+- "[You don't normally replace the foundations of a house once it has been built.](https://github.com/h5bp/html5-boilerplate/blob/v4.2.0/doc/faq.md#do-i-need-to-upgrade-my-sites-each-time-a-new-version-of-html5-boilerplate-is-released)"
 
