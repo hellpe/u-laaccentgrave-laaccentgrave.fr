@@ -11,11 +11,15 @@ COMMENT J'AI FAIT
 
 ##Le truc avec Grunt là
 
-Ben j'ai ouvert un terminal dans ce dossier et j'ai fait `npm install` puis `grunt dev`, comme expliqué sur le site officiel, quoi.
+Ben j'ai ouvert un terminal dans ce dossier et j'ai fait `npm install` puis `grunt dev`, comme expliqué sur le site officiel, quoi. Et naturellement, je fais gaffe à relancer Grunt à chaque fois que je reprend le taf.
 
 ##FTPer mon thème dans le dossier des thèmes de Wordpress
 
-C'est là qu'il faut pas se faire niquer : ne _pas_ copier le dossier `/node_modules` (crée par la commande `npm install`). Il pèse dix tonnes et je suis quasiment sûr qu'il ne sert à rien sur le serveur : c'est certainement pour bosser en local uniquement.
+C'est là qu'il faut pas se faire niquer : ne _pas_ copier le dossier `/node_modules` (crée par la commande `npm install`). Il pèse dix tonnes et il ne sert à rien sur le serveur : c'est certainement pour bosser en local uniquement.
+
+### Mettre le petit nom du thème dans `style.css` et `screenshot.png` 
+
+Ça sert juste à "baptiser" le thème.
 
 ##Taper dans les CSS !
 
@@ -35,10 +39,23 @@ J'ai prévu des effets à la con pour mon site, donc ça va barder.
 	@body-bg:               lighten(@header-bg); // bleu
 	@page-header-text-color:	@gray-lighter; //nouvelle variable pour le texte de la bannière
 	@text-color:            @gray-darker;
+	@link-color:            darken(@brand-primary, 15%);
 	@headings-color:        #fff;
 	
 	@border-radius-extreme:     35px; // pour les vignettes d'article
+	
+	@thumbnail-bg:          @page-header-bg;
 ```
+
+Pour les couleurs `@page-header*`, j'ai précisé ça dans `scaffolding.less` :
+
+```less
+body.home {
+  color: @gray-lighter;
+  background-color: @page-header-bg;
+}
+```
+
 
 ### Polices
 
@@ -59,13 +76,69 @@ Pour le logo, j'ai dû changer la typo dans `navbar.less` et les couleurs dans `
 	h3, .h3 { text-transform: uppercase; } // j'imagine que c'est bien pour les intertitres aussi
 ```
 
-J'ajoute les bordures bien dégueu
+J'ajoute les bordures bien dégueu sur les titres :
+
+```less
+h1, .h1 { text-shadow:	2px 0 0 @brand-primary,
+                   	-2px 0 0 @brand-primary,
+                  	0 2px 0 @brand-primary,
+                    	0 -2px 0 @brand-primary,  
+        
+       			2px 2px 0 @brand-primary,
+      			-2px -2px 0 @brand-primary,
+                    	2px -2px 0 @brand-primary,
+                    	-2px 2px 0 @brand-primary, /*contour*/
+
+                    	0 5px 0 @brand-primary, /*ombre*/
+                    	2px 5px 0 @brand-primary,
+                    	-2px 5px 0 @brand-primary; /*contour de l'ombre*/
+  		  	-webkit-text-stroke: 1px @brand-primary; /*contour intérieur*/ }
+```
+
+Pour les `h2` j'ai fait pareil en réduisant un peu les tailles (1,5 au lieu de 2, 4 au lieu de 5), puis j'ai ajouté l'inversion des couleurs en `:hover` et en `:focus`.
+
+### Vignettes
+
+Pour l'effet d'*ombre* sur les vignettes, j'ai mis au point 2 méthodes :
+
+1. avec deux `<div>`, un `.parallelogrammeGros` (l'ombre) et un `.parallelogramme` tout court (l'image), ce qui me permet du texte qui déborde pas hors de l'ombre (marquee U-LÀLÀ)
+2. avec un seul `<div class="parallelogramme">`sur lequel je mets une `box-shadow`, ce qui m'oblige à utiliser `position: relative` (y'a ptet une méthode plus élégante) pour pouvoir mettre du texte sur l'ombre (dates sur la home)
+
+Pour les articles de la home, j'ai mis le CSS correspondant dans `thumbnails.less` (en utilisant la méthode n°2 : celle à base de `box-shadow`) :
+
+```css
+.parallelogramme {
+  width:200px; 
+  height:200px; 
+  border-radius: 35px;
+  overflow: hidden;
+  transform: skew(-11deg); 
+    -webkit-transform: skew(-11deg);
+  border-radius: @border-radius-extreme;
+  box-shadow: 0 -30px 0 @brand-primary;
+}
+
+.parallelogramme img{
+  position: relative;
+  left: -20px;
+  top: -60px;
+  transform: skew(11deg); 
+    -webkit-transform: skew(11deg);
+}
+```
+
+Pour centrer les dates, je les ai passées en `display: block`.
+Reste à régler le padding des vignettes, pour les rendre moins large (peut-être étudier le Grid System de Bootstrap au préalable)
+
+### pager.less
+
+~~détail à la con : j'ai incliné les boutons de bas de page~~ laisse tomber, y'a pas moyen d'incliner le cartouche sans le texte, ça fait trop moche
 
 ### Virer le superflu
 
 J'ai commenté des trucs dans `bootstrap.less`. Reste à savoir qu'est-ce qui est inutile et qu'est-ce qui ne l'est pas.
 
-##La Hiérarchie
+## Taper dans le PHP ! (alias les templates)
 
 Si j'ai bien compris c'est :
 - `home.php` pour la page d'accueil (liste des articles les plus récents)
@@ -84,43 +157,24 @@ Si j'ai bien compris c'est :
 
 Ça tombe bien c'est exactement ce qu'il me faut.
 Par contre à mon avis, il ne faut pas faire ce qui suit : copier `templates/content.php` vers `content-home.php`
-J'ai ensuite fusionné `home.php` avec [ça](http://getbootstrap.com/components/#thumbnails), et pour aller à la ligne j'utilise [ce code](http://wordpress.org/support/topic/adding-a-clearing-div-to-every-third-post-in-the-loop) trouvé au pif sur Google, mais en virant la première ligne (càd en préservant la syntaxte normale de WP)
+J'ai ensuite fusionné `home.php` avec [ça](http://getbootstrap.com/components/#thumbnails), et pour aller à la ligne j'utilise [ce code](http://wordpress.org/support/topic/adding-a-clearing-div-to-every-third-post-in-the-loop) trouvé au pif sur Google, mais en virant la première ligne (càd en préservant la syntaxte normale de WP, vu que le `if (have_posts())` est déjà plus haut)
 > (à voir également : http://www.wpbeginner.com/wp-themes/how-to-create-a-grid-display-of-post-thumbnails-in-wordpress-themes/)
 
-#### Vignettes
+Et pour faire les vignettes, j'ai rajouté mon `<div class="parallelogramme">` en suivant la méthode n°2 (cf. plus haut).
+La norme à adopter semble être 230x200 (on rajoute 15px à gauche et à droite) ; reste à voir comment gérer la vignette plus grosse en header.
 
-Pour l'effet d'*ombre* sur les vignettes, j'ai mis au point 2 méthodes :
+Pour les dates, il y a [le problème des posts du 1er](http://www.wordpress-fr.org/support/viewtopic.php?id=19609) (solution : éviter de poster le 1er du mois héhéhé)
 
-1. avec deux `<div>`, un gros (l'ombre) et un petit (l'image), ce qui me permet du texte qui déborde pas hors de l'ombre (marquee U-LÀLÀ)
-2. avec `box-shadow`, ce qui m'oblige à utiliser `position: relative` (y'a ptet une méthode plus élégante) pour pouvoir mettre du texte sur l'ombre
+### Header
 
-Il me fallait le petit effet sur les vignettes, je les ai donc foutues dans un `<div class="parallelogramme">`, et le CSS correspondant dans `thumbnails.less` (en utilisant la méthode n°2 : celle à base de `box-shadow`) :
+même méthode bizarre : je copie `templates/page-header.php` vers `page-header-home.php`
+(faut-il plutôt créer un `base-home.php` ? on verra)
 
-```css
-.parallelogramme {
-  width:200px; 
-  height:200px; 
-  border-radius: 35px;
-  overflow: hidden;
-  transform: skew(-11deg); 
-    -webkit-transform: skew(-11deg);
-  border-radius: 35px;
-  box-shadow: 0 -30px 0 @brand-primary;
-}
-
-.parallelogramme img{
-  position: relative;
-  left: -20px;
-  top: -60px;
-  transform: skew(11deg); 
-    -webkit-transform: skew(11deg);
-}
-```
-
-
+la méthode n°1 de vignettes me fait créer des classes en plus, c'est moche mais ça marche (faut que j'apprenne à me servir du Less)
 
 ## MISC
 
-- je crois que je vais devoir virer le h1 comme sur Large Prime Numbers
+- ~~je crois que je vais devoir virer le `<h1>` de la home ("Derniers articles") comme sur Large Prime Numbers~~ non, je peux être plus malin que ça et mettre U-LÀLÀ en `<h1>`, même si ce qui suit reste vrai
+- sémantiquement, le titre de l'article "featured" doit avoir les mêmes balises que les autres, donc je ferai probablement `<h2 class="grostitre">`.
 - "[You don't normally replace the foundations of a house once it has been built.](https://github.com/h5bp/html5-boilerplate/blob/v4.2.0/doc/faq.md#do-i-need-to-upgrade-my-sites-each-time-a-new-version-of-html5-boilerplate-is-released)"
 
